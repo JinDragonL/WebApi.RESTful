@@ -18,9 +18,9 @@ namespace Sample.WebApiRestful.Data
             _sampleWebApiContext = sampleWebApiContext;
         }
 
-        public async Task<List<T>> GetAll(Expression<Func<T, bool>> expression = null)
+        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> expression = null)
         {
-            if(expression == null)
+            if (expression == null)
             {
                 return await _sampleWebApiContext.Set<T>().ToListAsync();
             }
@@ -28,17 +28,17 @@ namespace Sample.WebApiRestful.Data
             return await _sampleWebApiContext.Set<T>().Where(expression).ToListAsync();
         }
 
-        public T GetById(object id)
+        public async Task<T> GetByIdAsync(object id)
         {
-            return _sampleWebApiContext.Set<T>().Find(id);
+            return await _sampleWebApiContext.Set<T>().FindAsync(id);
         }
 
-        public void Insert(T entity)
+        public void InserAsynct(T entity)
         {
             _sampleWebApiContext.Set<T>().AddAsync(entity);
         }
 
-        public void Insert(IEnumerable<T> entities)
+        public void InsertAsync(IEnumerable<T> entities)
         {
             _sampleWebApiContext.Set<T>().AddRangeAsync(entities);
         }
@@ -47,7 +47,7 @@ namespace Sample.WebApiRestful.Data
         {
             EntityEntry entityEntry = _sampleWebApiContext.Entry<T>(entity);
             entityEntry.State = EntityState.Modified;
-      }
+        }
 
         public void Delete(T entity)
         {
@@ -59,7 +59,7 @@ namespace Sample.WebApiRestful.Data
         {
             var entities = _sampleWebApiContext.Set<T>().Where(expression).ToList();
 
-            if(entities.Count > 0)
+            if (entities.Count > 0)
             {
                 _sampleWebApiContext.Set<T>().RemoveRange(entities);
             }
@@ -67,9 +67,9 @@ namespace Sample.WebApiRestful.Data
 
         public IQueryable<T> Table => _sampleWebApiContext.Set<T>();
 
-        public async Task Commit()
+        public async Task CommitAsync()
         {
-           await _sampleWebApiContext.SaveChangesAsync();
+            await _sampleWebApiContext.SaveChangesAsync();
         }
     }
 }

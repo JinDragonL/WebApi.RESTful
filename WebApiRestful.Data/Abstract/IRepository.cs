@@ -8,14 +8,15 @@ namespace Sample.WebApiRestful.Data.Abstract
 {
     public interface IRepository<T> where T : class
     {
-        Task<List<T>> GetAll(Expression<Func<T, bool>> expression = null);
-        T GetById(object id);
-        void Insert(T entity);
-        void Insert(IEnumerable<T> entities);
-        void Update(T entity); 
-        void Delete(T entity);
-        void Delete(Expression<Func<T, bool>> expression);
-        Task Commit();
         IQueryable<T> Table { get; }
+
+        Task CommitAsync();
+        void Delete(Expression<Func<T, bool>> expression);
+        void Delete(T entity);
+        Task<List<T>> GetAllAsync(Expression<Func<T, bool>> expression = null);
+        Task<T> GetByIdAsync(object id);
+        void InserAsynct(T entity);
+        void InsertAsync(IEnumerable<T> entities);
+        void Update(T entity);
     }
 }
