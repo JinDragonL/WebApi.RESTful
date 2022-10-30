@@ -3,9 +3,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sample.WebApiRestful.Data;
 using Sample.WebApiRestful.Data.Abstract;
-using Sample.WebApiRestful.Service;
+using WebApiRestful.Service;
+using WebApiRestful.Service.Abstract;
 
-namespace Sample.WebApiRestful.Infrastructure.Configuration
+namespace WebApiRestful.Infrastructure.Configuration
 {
     public static class ConfigurationService
     {
@@ -22,6 +23,8 @@ namespace Sample.WebApiRestful.Infrastructure.Configuration
             service.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             service.AddScoped(typeof(IDapperHelper<>), typeof(DapperHelper<>));
             service.AddScoped<ICategoryService, CategoryService>();
+            service.AddScoped<IUserService, UserService>();
+
 
 
         }

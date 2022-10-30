@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sample.WebApiRestful.Data;
 
 namespace Sample.WebApiRestful.Data.Migrations
 {
     [DbContext(typeof(WebApiRestfulContext))]
-    partial class SampleWebApiContextModelSnapshot : ModelSnapshot
+    [Migration("20221030034542_add-tbl-user")]
+    partial class addtbluser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -19,7 +21,7 @@ namespace Sample.WebApiRestful.Data.Migrations
                 .HasAnnotation("ProductVersion", "5.0.17")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("WebApiRestful.Domain.Entities.Categories", b =>
+            modelBuilder.Entity("Sample.WebApiRestful.Domain.Entities.Categories", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -43,7 +45,7 @@ namespace Sample.WebApiRestful.Data.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("WebApiRestful.Domain.Entities.Products", b =>
+            modelBuilder.Entity("Sample.WebApiRestful.Domain.Entities.Products", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -82,43 +84,9 @@ namespace Sample.WebApiRestful.Data.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("WebApiRestful.Domain.Entities.User", b =>
+            modelBuilder.Entity("Sample.WebApiRestful.Domain.Entities.Products", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DisplayName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastLoggedIn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("User");
-                });
-
-            modelBuilder.Entity("WebApiRestful.Domain.Entities.Products", b =>
-                {
-                    b.HasOne("WebApiRestful.Domain.Entities.Categories", "Categories")
+                    b.HasOne("Sample.WebApiRestful.Domain.Entities.Categories", "Categories")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)

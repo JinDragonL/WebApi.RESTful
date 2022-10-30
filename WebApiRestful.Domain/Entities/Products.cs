@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Sample.WebApiRestful.Domain.Entities
+namespace WebApiRestful.Domain.Entities
 {
     public class Products: BaseEntity
     {

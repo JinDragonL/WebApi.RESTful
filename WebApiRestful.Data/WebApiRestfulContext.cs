@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Sample.WebApiRestful.Domain.Entities;
+using WebApiRestful.Domain.Entities;
 
 namespace Sample.WebApiRestful.Data
 {
@@ -12,6 +12,8 @@ namespace Sample.WebApiRestful.Data
 
         public DbSet<Categories> Categories { get; set; }
         public DbSet<Products> Products { get; set; }
+        public DbSet<User> User { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

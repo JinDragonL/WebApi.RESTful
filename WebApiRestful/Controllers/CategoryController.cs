@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Sample.WebApiRestful.Service;
 using System.Threading.Tasks;
+using WebApiRestful.Service.Abstract;
 
 namespace WebApiRestful.Controllers
 {

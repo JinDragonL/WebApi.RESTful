@@ -1,8 +1,8 @@
-﻿using Sample.WebApiRestful.Domain.Entities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using WebApiRestful.Domain.Entities;
 
-namespace Sample.WebApiRestful.Service
+namespace WebApiRestful.Service.Abstract
 {
     public interface ICategoryService
     {

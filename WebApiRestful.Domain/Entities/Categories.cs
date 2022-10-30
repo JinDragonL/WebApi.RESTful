@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Sample.WebApiRestful.Domain.Entities
+namespace WebApiRestful.Domain.Entities
 {
     public class Categories: BaseEntity
     {

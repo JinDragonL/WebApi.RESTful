@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Sample.WebApiRestful.Data.Abstract;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Sample.WebApiRestful.Data.Abstract;
 
 namespace Sample.WebApiRestful.Data
 {
@@ -31,6 +31,11 @@ namespace Sample.WebApiRestful.Data
         public async Task<T> GetByIdAsync(object id)
         {
             return await _sampleWebApiContext.Set<T>().FindAsync(id);
+        }
+
+        public async Task<T> GetSingleByConditionAsync(Expression<Func<T, bool>> expression = null)
+        {
+            return await _sampleWebApiContext.Set<T>().FirstOrDefaultAsync();
         }
 
         public void InserAsynct(T entity)
