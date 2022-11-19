@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebApiRestful.Authentication.Service;
 
 namespace WebApiRestful.Infrastructure.Configuration
 {
@@ -14,7 +15,12 @@ namespace WebApiRestful.Infrastructure.Configuration
     {
         public static void RegisterTokenBear(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddAuthentication()
+            services.AddAuthentication(options =>
+                    {
+                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    })
                     .AddJwtBearer(options =>
                     {
                         options.SaveToken = true;
@@ -33,10 +39,12 @@ namespace WebApiRestful.Infrastructure.Configuration
                         {
                             OnTokenValidated = context =>
                             {
-                                return Task.CompletedTask;
+                                var tokenHandler = context.HttpContext.RequestServices.GetRequiredService<ITokenHandler>();
+                                return tokenHandler.ValidateToken(context);
                             },
                             OnAuthenticationFailed = context =>
                             {
+                                // Record log
                                 return Task.CompletedTask;
                             },
                             OnMessageReceived = context =>
@@ -45,6 +53,9 @@ namespace WebApiRestful.Infrastructure.Configuration
                             },
                             OnChallenge = context =>
                             {
+                                string error = context.ErrorDescription;
+                                // Record log
+
                                 return Task.CompletedTask;
                             }
                         };

@@ -8,4 +8,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.17" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WebApiRestful.Data\WebApiRestful.Data.csproj" />
+    <ProjectReference Include="..\WebApiRestful.Domain\WebApiRestful.Domain.csproj" />
+    <ProjectReference Include="..\WebApiRestful.Service\WebApiRestful.Service.csproj" />
+  </ItemGroup>
+
 </Project>

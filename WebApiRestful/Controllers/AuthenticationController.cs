@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using WebApiRestful.Authentication.Service;
 using WebApiRestful.Service.Abstract;
 using WebApiRestful.ViewModel;
 
@@ -11,10 +12,12 @@ namespace WebApiRestful.Controllers
     public class AuthenticationController : ControllerBase
     {
         IUserService _userService;
+        ITokenHandler _tokenHandler;
 
-        public AuthenticationController(IUserService userService)
+        public AuthenticationController(IUserService userService, ITokenHandler tokenHandler)
         {
             _userService = userService;
+            _tokenHandler = tokenHandler;
         }
 
         [HttpPost("login")]
@@ -33,11 +36,10 @@ namespace WebApiRestful.Controllers
                 return Unauthorized();
             }
 
-            //
-
-
-            return Ok(true);
+            return await Task.Factory.StartNew(() =>
+            {
+                return Ok(_tokenHandler.CreateToken(user));
+            });
         }
-
     }
 }

@@ -9,7 +9,7 @@ using Sample.WebApiRestful.Data.Abstract;
 
 namespace Sample.WebApiRestful.Data
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public class Repository<T> : IRepository<T>, IDisposable where T : class
     {
         WebApiRestfulContext _sampleWebApiContext;
 
@@ -75,6 +75,11 @@ namespace Sample.WebApiRestful.Data
         public async Task CommitAsync()
         {
             await _sampleWebApiContext.SaveChangesAsync();
+        }
+
+        public void Dispose()
+        {
+            //if (_sampleWebApiContext != null) _sampleWebApiContext.Dispose();
         }
     }
 }

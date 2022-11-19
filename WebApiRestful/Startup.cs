@@ -27,7 +27,7 @@ namespace Sample.WebApiRestful
             services.RegisterDI();
 
             // Register Authentication Token
-            services.RegisterTokenBear();
+            services.RegisterTokenBear(Configuration);
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -50,6 +50,7 @@ namespace Sample.WebApiRestful
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

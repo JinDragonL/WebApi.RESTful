@@ -18,5 +18,10 @@ namespace WebApiRestful.Service
         {
             return await _repositoryUser.GetSingleByConditionAsync(x => x.Username == username && x.Password == password);
         }
+
+        public async Task<User> FindByUsername(string username)
+        {
+            return await _repositoryUser.GetSingleByConditionAsync(x => x.Username == username);
+        }
     }
 }
