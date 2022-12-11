@@ -38,14 +38,14 @@ namespace Sample.WebApiRestful.Data
             return await _sampleWebApiContext.Set<T>().FirstOrDefaultAsync();
         }
 
-        public void InserAsynct(T entity)
+        public async Task InsertAsync(T entity)
         {
-            _sampleWebApiContext.Set<T>().AddAsync(entity);
+            await _sampleWebApiContext.Set<T>().AddAsync(entity);
         }
 
-        public void InsertAsync(IEnumerable<T> entities)
+        public async Task InsertAsync(IEnumerable<T> entities)
         {
-            _sampleWebApiContext.Set<T>().AddRangeAsync(entities);
+            await _sampleWebApiContext.Set<T>().AddRangeAsync(entities);
         }
 
         public void Update(T entity)

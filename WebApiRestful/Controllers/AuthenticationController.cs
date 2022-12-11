@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 using WebApiRestful.Authentication.Service;
+using WebApiRestful.Domain.Model;
+using WebApiRestful.Service;
 using WebApiRestful.Service.Abstract;
 using WebApiRestful.ViewModel;
 
@@ -13,11 +16,13 @@ namespace WebApiRestful.Controllers
     {
         IUserService _userService;
         ITokenHandler _tokenHandler;
+        IUserTokenService _userTokenService;
 
-        public AuthenticationController(IUserService userService, ITokenHandler tokenHandler)
+        public AuthenticationController(IUserService userService, ITokenHandler tokenHandler, IUserTokenService userTokenService)
         {
             _userService = userService;
             _tokenHandler = tokenHandler;
+            _userTokenService = userTokenService;
         }
 
         [HttpPost("login")]
@@ -36,10 +41,34 @@ namespace WebApiRestful.Controllers
                 return Unauthorized();
             }
 
-            return await Task.Factory.StartNew(() =>
+            (string accessToken, DateTime expiredDateAccess) = await _tokenHandler.CreateAccessToken(user);
+            (string code, string refreshToken, DateTime expiredDateRefresh) = await _tokenHandler.CreateRefreshToken(user);
+
+            await _userTokenService.SaveToken(new Domain.Entities.UserToken
             {
-                return Ok(_tokenHandler.CreateToken(user));
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                CodeRefreshToken = code,
+                ExpiredDateAccessToken = expiredDateAccess,
+                ExpiredDateRefreshToken = expiredDateRefresh,
+                CreatedDate = DateTime.Now,
+                UserId = user.Id,
+                IsActive = true
             });
+
+            return Ok(new JwtModel
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                Fullname = user.DisplayName,
+                Username = user.Username,
+            });
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenModel token)
+        {
+            return Ok(await _tokenHandler.ValidateRefreshToken(token));
         }
     }
 }

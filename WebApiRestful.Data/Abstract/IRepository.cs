@@ -21,8 +21,8 @@ namespace Sample.WebApiRestful.Data.Abstract
         Task<List<T>> GetAllAsync(Expression<Func<T, bool>> expression = null);
         Task<T> GetByIdAsync(object id);
         Task<T> GetSingleByConditionAsync(Expression<Func<T, bool>> expression = null);
-        void InserAsynct(T entity);
-        void InsertAsync(IEnumerable<T> entities);
+        Task InsertAsync(T entity);
+        Task InsertAsync(IEnumerable<T> entities);
         void Update(T entity);
     }
 }

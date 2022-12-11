@@ -26,7 +26,7 @@ namespace WebApiRestful.Infrastructure.Configuration
             service.AddScoped<ICategoryService, CategoryService>();
             service.AddScoped<IUserService, UserService>();
             service.AddScoped<ITokenHandler, TokenHandler>();
-
+            service.AddScoped<IUserTokenService, UserTokenService>();
 
         }
     }
