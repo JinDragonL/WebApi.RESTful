@@ -34,6 +34,17 @@ namespace Sample.WebApiRestful
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sample.WebApiRestful", Version = "v1" });
             });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(
+                    "MyPolicy", builder =>
+                    {
+                        builder.WithOrigins("http://localhost:4200").
+                                AllowAnyMethod().
+                                AllowAnyHeader();
+                    });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,6 +58,12 @@ namespace Sample.WebApiRestful
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors(x => x
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .SetIsOriginAllowed(origin => true) // allow any origin
+               .AllowCredentials()); // allow credentials
 
             app.UseRouting();
 

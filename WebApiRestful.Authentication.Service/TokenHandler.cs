@@ -153,6 +153,8 @@ namespace WebApiRestful.Authentication.Service
                     new TokenValidationParameters
                     {
                         RequireExpirationTime = true,
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["TokenBear:SignatureKey"])),
                         ValidateIssuerSigningKey = true,
                         ValidateLifetime = true,

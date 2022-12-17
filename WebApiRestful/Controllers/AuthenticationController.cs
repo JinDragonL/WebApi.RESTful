@@ -61,14 +61,17 @@ namespace WebApiRestful.Controllers
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
                 Fullname = user.DisplayName,
-                Username = user.Username,
+                Username = user.Username
             });
         }
 
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenModel token)
         {
-            return Ok(await _tokenHandler.ValidateRefreshToken(token));
+            if (token == null) 
+                return BadRequest("Could not get refresh token");
+
+            return Ok(await _tokenHandler.ValidateRefreshToken(token.RefreshToken));
         }
     }
 }
