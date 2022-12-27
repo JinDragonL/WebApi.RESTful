@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Sample.WebApiRestful.Data.Abstract
+namespace WebApiRestful.Data.Abstract
 {
     public interface IRepository<T> where T : class
     {

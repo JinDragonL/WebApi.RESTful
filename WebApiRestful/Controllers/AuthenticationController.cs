@@ -4,7 +4,6 @@ using System;
 using System.Threading.Tasks;
 using WebApiRestful.Authentication.Service;
 using WebApiRestful.Domain.Model;
-using WebApiRestful.Service;
 using WebApiRestful.Service.Abstract;
 using WebApiRestful.ViewModel;
 

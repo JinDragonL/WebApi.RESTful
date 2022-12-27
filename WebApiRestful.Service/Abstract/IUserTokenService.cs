@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using WebApiRestful.Domain.Entities;
 
-namespace WebApiRestful.Service
+namespace WebApiRestful.Service.Abstract
 {
     public interface IUserTokenService
     {

@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Sample.WebApiRestful.Data;
 using Sample.WebApiRestful.Data.Abstract;
 using WebApiRestful.Authentication.Service;
+using WebApiRestful.Data;
+using WebApiRestful.Data.Abstract;
 using WebApiRestful.Service;
 using WebApiRestful.Service.Abstract;
 
@@ -22,6 +24,7 @@ namespace WebApiRestful.Infrastructure.Configuration
         public static void RegisterDI(this IServiceCollection service)
         {
             service.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            service.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
             service.AddScoped(typeof(IDapperHelper<>), typeof(DapperHelper<>));
             service.AddScoped<ICategoryService, CategoryService>();
             service.AddScoped<IUserService, UserService>();

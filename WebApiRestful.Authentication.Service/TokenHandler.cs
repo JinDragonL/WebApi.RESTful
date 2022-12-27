@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using WebApiRestful.Domain.Entities;
 using WebApiRestful.Domain.Model;
-using WebApiRestful.Service;
 using WebApiRestful.Service.Abstract;
 
 namespace WebApiRestful.Authentication.Service

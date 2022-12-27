@@ -5,11 +5,12 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Sample.WebApiRestful.Data.Abstract;
+using Sample.WebApiRestful.Data;
+using WebApiRestful.Data.Abstract;
 
-namespace Sample.WebApiRestful.Data
+namespace WebApiRestful.Data
 {
-    public class Repository<T> : IRepository<T>, IDisposable where T : class
+    public class Repository<T> : IRepository<T> where T : class
     {
         WebApiRestfulContext _sampleWebApiContext;
 
@@ -77,9 +78,5 @@ namespace Sample.WebApiRestful.Data
             await _sampleWebApiContext.SaveChangesAsync();
         }
 
-        public void Dispose()
-        {
-            //if (_sampleWebApiContext != null) _sampleWebApiContext.Dispose();
-        }
     }
 }

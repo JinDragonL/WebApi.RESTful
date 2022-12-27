@@ -1,5 +1,5 @@
-﻿using Sample.WebApiRestful.Data.Abstract;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using WebApiRestful.Data.Abstract;
 using WebApiRestful.Domain.Entities;
 using WebApiRestful.Service.Abstract;
 
@@ -7,26 +7,26 @@ namespace WebApiRestful.Service
 {
     public class UserService : IUserService
     {
-        IRepository<User> _repositoryUser;
+        IUnitOfWork _unitOfWork;
 
-        public UserService(IRepository<User> repositoryUser)
+        public UserService(IUnitOfWork unitOfWork)
         {
-            _repositoryUser = repositoryUser;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<User> CheckLogin(string username, string password)
         {
-            return await _repositoryUser.GetSingleByConditionAsync(x => x.Username == username && x.Password == password);
+            return await _unitOfWork.RepositoryUser.GetSingleByConditionAsync(x => x.Username == username && x.Password == password);
         }
 
         public async Task<User> FindByUsername(string username)
         {
-            return await _repositoryUser.GetSingleByConditionAsync(x => x.Username == username);
+            return await _unitOfWork.RepositoryUser.GetSingleByConditionAsync(x => x.Username == username);
         }
 
         public async Task<User> FindById(int userId)
         {
-            return await _repositoryUser.GetSingleByConditionAsync(x => x.Id == userId);
+            return await _unitOfWork.RepositoryUser.GetSingleByConditionAsync(x => x.Id == userId);
         }
     }
 }

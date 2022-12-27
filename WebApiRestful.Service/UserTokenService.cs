@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebApiRestful.Data.Abstract;
 using WebApiRestful.Domain.Entities;
+using WebApiRestful.Service.Abstract;
 
 namespace WebApiRestful.Service
 {
