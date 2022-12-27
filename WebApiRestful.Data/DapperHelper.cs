@@ -1,13 +1,13 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Sample.WebApiRestful.Data.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using WebApiRestful.Data.Abstract;
 
-namespace Sample.WebApiRestful.Data
+namespace WebApiRestful.Data
 {
     public class DapperHelper<T> : IDapperHelper<T> where T : class
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Sample.WebApiRestful.Data.Abstract
+namespace WebApiRestful.Data.Abstract
 {
     public interface IDapperHelper<T> where T : class
     {

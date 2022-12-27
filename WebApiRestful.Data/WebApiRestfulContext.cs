@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebApiRestful.Domain.Entities;
 
-namespace Sample.WebApiRestful.Data
+namespace WebApiRestful.Data
 {
     public class WebApiRestfulContext : DbContext
     {

@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Sample.WebApiRestful.Data;
 using WebApiRestful.Data.Abstract;
 
 namespace WebApiRestful.Data

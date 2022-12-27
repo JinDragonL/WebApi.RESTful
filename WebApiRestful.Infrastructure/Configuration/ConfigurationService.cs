@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Sample.WebApiRestful.Data;
-using Sample.WebApiRestful.Data.Abstract;
 using WebApiRestful.Authentication.Service;
 using WebApiRestful.Data;
 using WebApiRestful.Data.Abstract;

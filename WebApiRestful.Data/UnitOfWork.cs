@@ -1,5 +1,4 @@
-﻿using Sample.WebApiRestful.Data;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using WebApiRestful.Data.Abstract;
 using WebApiRestful.Domain.Entities;
