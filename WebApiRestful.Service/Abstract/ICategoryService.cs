@@ -7,7 +7,7 @@ namespace WebApiRestful.Service.Abstract
     public interface ICategoryService
     {
         Task<List<Categories>> GetCategoryAll();
-        string GetCategoryNameById(int id);
+        Task<string> GetCategoryNameByIdAsync(int id);
         Task<bool> UpdateStatus(int id);
     }
 }

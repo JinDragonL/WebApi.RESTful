@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\WebApi.Restful.Core\WebApi.Restful.Core.csproj" />
     <ProjectReference Include="..\WebApiRestful.Authentication.Service\WebApiRestful.Authentication.Service.csproj" />
     <ProjectReference Include="..\WebApiRestful.Service\WebApiRestful.Service.csproj" />
   </ItemGroup>

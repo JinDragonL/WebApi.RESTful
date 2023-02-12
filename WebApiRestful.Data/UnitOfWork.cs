@@ -8,10 +8,10 @@ namespace WebApiRestful.Data
     public class UnitOfWork : IUnitOfWork, IDisposable
     {
         WebApiRestfulContext _webApiRestfulContext;
-
         Repository<User> _repositoryUser;
         Repository<UserToken> _repositoryUserToken;
-        private bool disposedValue;
+
+        private bool _disposedValue;
 
         public UnitOfWork(WebApiRestfulContext webApiRestfulContext)
         {
@@ -34,14 +34,14 @@ namespace WebApiRestful.Data
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
                     _webApiRestfulContext.Dispose();
                 }
 
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 
@@ -52,3 +52,10 @@ namespace WebApiRestful.Data
         }
     }
 }
+
+//Cache
+
+//Memory-Cache -->  IMemoryCache 
+//Distribute Cache --> NCache 
+//Redis  --> 
+//Sql Cache

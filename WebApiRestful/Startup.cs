@@ -1,9 +1,11 @@
+using Alachisoft.NCache.Caching.Distributed;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System.Configuration;
 using WebApiRestful.Infrastructure.Configuration;
 
 namespace Sample.WebApiRestful
@@ -20,6 +22,12 @@ namespace Sample.WebApiRestful
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddNCacheDistributedCache(configuration => {
+                configuration.CacheName = "WebApiRestfulCache";
+                configuration.EnableLogs = true;
+                configuration.ExceptionsEnabled = true;
+            });
+
             //Register Datatabase
             services.RegisterContextDb(Configuration);
 

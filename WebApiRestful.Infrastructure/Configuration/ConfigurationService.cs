@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WebApi.Restful.Core.Cache;
 using WebApiRestful.Authentication.Service;
 using WebApiRestful.Data;
 using WebApiRestful.Data.Abstract;
@@ -22,13 +23,18 @@ namespace WebApiRestful.Infrastructure.Configuration
         public static void RegisterDI(this IServiceCollection service)
         {
             service.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-            service.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
             service.AddScoped(typeof(IDapperHelper<>), typeof(DapperHelper<>));
+            service.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
+
+            service.AddSingleton<IDistributedCacheService, DistributedCacheService>();
+
             service.AddScoped<ICategoryService, CategoryService>();
             service.AddScoped<IUserService, UserService>();
             service.AddScoped<ITokenHandler, TokenHandler>();
             service.AddScoped<IUserTokenService, UserTokenService>();
 
         }
+
+     
     }
 }

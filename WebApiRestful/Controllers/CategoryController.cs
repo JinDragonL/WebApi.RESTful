@@ -6,7 +6,7 @@ using WebApiRestful.Service.Abstract;
 
 namespace WebApiRestful.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CategoryController : ControllerBase
@@ -33,13 +33,7 @@ namespace WebApiRestful.Controllers
         [HttpGet("get-name-category-by-id")]
         public async Task<IActionResult> GetCategoryNameByIdAsync(int id)
         {
-            IActionResult actionResult = null;
-            await Task.Factory.StartNew(() =>
-            {
-                actionResult = Ok(_categoryService.GetCategoryNameById(id));
-            });
-
-            return actionResult;
+            return Ok(await _categoryService.GetCategoryNameByIdAsync(id));
         }
     }
 
