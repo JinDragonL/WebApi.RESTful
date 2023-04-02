@@ -14,6 +14,7 @@ namespace WebApiRestful.Data
         public DbSet<Products> Products { get; set; }
         public DbSet<User> User { get; set; }
         public DbSet<UserToken> UserToken { get; set; }
+        public DbSet<DBLog> DBLog { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

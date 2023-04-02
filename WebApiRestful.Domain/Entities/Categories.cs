@@ -4,10 +4,8 @@ namespace WebApiRestful.Domain.Entities
 {
     public class Categories: BaseEntity
     {
-        [Required]
-        [StringLength(250)]
+        [StringLength(300)]
         public string Name { get; set; }
-        [StringLength(1000)]
-        public string  Description { get; set; }
+        public string Description { get; set; }
     }
 }

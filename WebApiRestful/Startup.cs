@@ -1,12 +1,18 @@
 using Alachisoft.NCache.Caching.Distributed;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System.Configuration;
+using NLog;
+using NLog.Extensions.Logging;
+using NLog.Web;
 using WebApiRestful.Infrastructure.Configuration;
+using WebApiRestful.Middleware;
 
 namespace Sample.WebApiRestful
 {
@@ -22,6 +28,13 @@ namespace Sample.WebApiRestful
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging(logging =>
+            {
+                logging.AddNLog();
+                logging.ClearProviders();
+                logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+            });
+
             services.AddNCacheDistributedCache(configuration => {
                 configuration.CacheName = "WebApiRestfulCache";
                 configuration.EnableLogs = true;
@@ -58,14 +71,33 @@ namespace Sample.WebApiRestful
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApi RESTful v1"));
             }
 
             app.UseHttpsRedirection();
+
+            //Handle Global Error
+            //app.UseExceptionHandler(error =>
+            //{
+            //    error.Run(async httpContext =>
+            //    {
+            //        var msg = httpContext.Features.Get<IExceptionHandlerFeature>();
+
+            //        int statusCode = httpContext.Response.StatusCode;
+
+            //        await httpContext.Response.WriteAsync($"{statusCode} - {msg.Error.Message}");
+
+            //    });
+            //});
+
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseCors(x => x
                .AllowAnyMethod()

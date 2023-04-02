@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using WebApi.Restful.Core.Cache;
 using WebApiRestful.Data.Abstract;
@@ -31,7 +33,7 @@ namespace WebApiRestful.Service
 
             await _categoryRepository.CommitAsync();
 
-            return await Task.FromResult(true);
+            return true;
         }
 
         public async Task<string> GetCategoryNameByIdAsync(int id)
@@ -50,7 +52,33 @@ namespace WebApiRestful.Service
             return name;
         }
 
-        //Task.FromResult
-        //Task.Factory.StartNew
+        public async Task<List<string>> GetCategories(CancellationToken cancellation)
+        {
+            List<string> ls = new();
+            try
+            {
+                var categories = await _categoryRepository.GetAllAsync();
+
+                foreach (var category in categories)
+                {
+                    if (cancellation.IsCancellationRequested) //CancellationTokenSource
+                        cancellation.ThrowIfCancellationRequested();
+
+                    ls.Add(category.Name);
+
+                    Thread.Sleep(3000);
+                }
+            }
+            catch (OperationCanceledException ex)
+            {
+                //record log
+                string log = ex.Message;
+                throw;
+            }
+
+            return ls;
+        }
+
+
     }
 }

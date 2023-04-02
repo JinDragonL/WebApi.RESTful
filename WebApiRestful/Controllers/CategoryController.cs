@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Alachisoft.NCache.Common.DataStructures.Clustered;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 using System.Threading.Tasks;
 using WebApiRestful.Service.Abstract;
 
 namespace WebApiRestful.Controllers
 {
     //[Authorize]
-    [Route("api/[controller]")]
+    [Route("api/[controller]")]  //api/category
     [ApiController]
     public class CategoryController : ControllerBase
     {
@@ -21,6 +22,8 @@ namespace WebApiRestful.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllCategory()
         {
+            throw new System.ArgumentNullException();
+
             return Ok(await _categoryService.GetCategoryAll());
         }
 
@@ -35,8 +38,21 @@ namespace WebApiRestful.Controllers
         {
             return Ok(await _categoryService.GetCategoryNameByIdAsync(id));
         }
+
+        [HttpGet("get-categories-with-cancel")]
+        public async Task<IActionResult> GetAllCategoryWithCancel(CancellationToken cancellation)
+        {
+            return Ok(await _categoryService.GetCategories(cancellation));
+        }
+
     }
 
+    //CancellationToken
+    //sync = dong bo
+    // 1, 2, 3
 
+    //.......................
 
+    //async = bat dong bo
+    // 1, 2, 3
 }
