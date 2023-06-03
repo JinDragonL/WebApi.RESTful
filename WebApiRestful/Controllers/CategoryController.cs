@@ -1,5 +1,5 @@
-﻿using Alachisoft.NCache.Common.DataStructures.Clustered;
-using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,7 +7,7 @@ using WebApiRestful.Service.Abstract;
 
 namespace WebApiRestful.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]  //api/category
     [ApiController]
     public class CategoryController : ControllerBase
@@ -19,17 +19,37 @@ namespace WebApiRestful.Controllers
             _categoryService = categoryService;
         }
 
+        /// <summary>
+        /// Get all categories
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException"></exception>
         [HttpGet]
+        [Produces("text/json")]
         public async Task<IActionResult> GetAllCategory()
         {
-            throw new System.ArgumentNullException();
+            //throw new System.ArgumentNullException();
+            var result = await _categoryService.GetCategoryAll();
 
-            return Ok(await _categoryService.GetCategoryAll());
+            return Ok(result);
         }
 
+
+        /// <summary>
+        /// Update category with Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpPatch]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateStatusAsync(int id)
         {
+            if(id == 0)
+            {
+                return BadRequest();
+            }
+
             return Ok(await _categoryService.UpdateStatus(id));
         }
 
@@ -46,13 +66,4 @@ namespace WebApiRestful.Controllers
         }
 
     }
-
-    //CancellationToken
-    //sync = dong bo
-    // 1, 2, 3
-
-    //.......................
-
-    //async = bat dong bo
-    // 1, 2, 3
 }

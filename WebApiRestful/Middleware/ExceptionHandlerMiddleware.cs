@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using NLog;
 using System;
-using System.CodeDom;
 using System.Threading.Tasks;
 
 namespace WebApiRestful.Middleware
@@ -13,7 +12,7 @@ namespace WebApiRestful.Middleware
         private readonly ILogger _logger = LogManager.GetLogger("logCategory1Target");
 
         public ExceptionMiddleware(RequestDelegate requestDelegate)
-        {
+        { 
             _requestDelegate = requestDelegate;
         }
 

@@ -164,7 +164,7 @@ namespace WebApiRestful.Authentication.Service
 
             if (cliamPriciple == null) return new();
 
-            string code = cliamPriciple.Claims.FirstOrDefault(x => x.Type == ClaimTypes.SerialNumber)?.Value;
+            string code = cliamPriciple?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.SerialNumber)?.Value;
 
             if (string.IsNullOrEmpty(code)) return new();
 

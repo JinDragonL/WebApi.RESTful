@@ -1,16 +1,20 @@
 using Alachisoft.NCache.Caching.Distributed;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using NLog;
 using NLog.Extensions.Logging;
 using NLog.Web;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using WebApiRestful.Configuration;
 using WebApiRestful.Infrastructure.Configuration;
 using WebApiRestful.Middleware;
 
@@ -35,7 +39,12 @@ namespace Sample.WebApiRestful
                 logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
             });
 
-            services.AddNCacheDistributedCache(configuration => {
+            //Automapper
+
+            services.AddAutoMapper(typeof(AutoMapperConfig).Assembly);
+
+            services.AddNCacheDistributedCache(configuration =>
+            {
                 configuration.CacheName = "WebApiRestfulCache";
                 configuration.EnableLogs = true;
                 configuration.ExceptionsEnabled = true;
@@ -53,7 +62,41 @@ namespace Sample.WebApiRestful
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sample.WebApiRestful", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Sample.WebApiRestful",
+                    Version = "v1",
+                    Description = "This is Swagger WebAPI Restful",
+
+                });
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.Http,
+                    In = ParameterLocation.Header,
+                    BearerFormat = "JWT",
+                    Scheme = "Bearer",
+                    Description = "Please input your token"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] { }
+                    }
+                });
+
+
+                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             });
 
             services.AddCors(options =>
@@ -67,7 +110,18 @@ namespace Sample.WebApiRestful
                     });
             });
         }
+        public class AuthResponsesOperationFilter : IOperationFilter
+        {
+            public void Apply(OpenApiOperation operation, OperationFilterContext context)
+            {
+                var authAttributes = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
+                    .Union(context.MethodInfo.GetCustomAttributes(true))
+                    .OfType<AuthorizeAttribute>();
 
+                if (authAttributes.Any())
+                    operation.Responses.Add("401", new OpenApiResponse { Description = "Unauthorized" });
+            }
+        }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -77,7 +131,7 @@ namespace Sample.WebApiRestful
                 app.UseDeveloperExceptionPage();
 
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApi RESTful v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WEBAPI RESTFUL v1"));
             }
 
             app.UseHttpsRedirection();
@@ -96,6 +150,7 @@ namespace Sample.WebApiRestful
             //    });
             //});
 
+            app.UseStaticFiles();
 
             app.UseMiddleware<ExceptionMiddleware>();
 
@@ -106,7 +161,7 @@ namespace Sample.WebApiRestful
                .AllowCredentials()); // allow credentials
 
             app.UseRouting();
-
+            app.UseStatusCodePages();
             app.UseAuthentication();
             app.UseAuthorization();
 
