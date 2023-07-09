@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using WebApiRestful.Authentication.Service;
+using WebApiRestful.Domain.Entities;
 using WebApiRestful.Domain.Model;
 using WebApiRestful.Service.Abstract;
 using WebApiRestful.ViewModel;
@@ -17,20 +21,29 @@ namespace WebApiRestful.Controllers
         ITokenHandler _tokenHandler;
         IUserTokenService _userTokenService;
 
-        public AuthenticationController(IUserService userService, ITokenHandler tokenHandler, IUserTokenService userTokenService)
+        public AuthenticationController(IUserService userService, ITokenHandler tokenHandler, 
+                                        IUserTokenService userTokenService)
         {
             _userService = userService;
             _tokenHandler = tokenHandler;
             _userTokenService = userTokenService;
         }
 
+        //FluentValidation
+
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] AccountModel accountModel)
+        public async Task<IActionResult> Login(IValidator<AccountModel> validator, [FromBody] AccountModel accountModel)
         {
-            if(accountModel == null)
+            var validations = await validator.ValidateAsync(accountModel);
+
+            if(!validations.IsValid)
             {
-                return BadRequest("User is not exist");
+                return BadRequest(validations.Errors.Select(x => new ErrorValdations
+                {
+                    FieldName = x.PropertyName,
+                    ErrorMessage = x.ErrorMessage
+                }));
             }
 
             var user = await _userService.CheckLogin(accountModel.Username, accountModel.Password);

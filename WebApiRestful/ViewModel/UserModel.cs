@@ -1,10 +1,12 @@
-﻿namespace WebApiRestful.ViewModel
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WebApiRestful.ViewModel
 {
-    public class UserModel
+    public class UserModel: AccountModel
     {
-        public int Id { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
         public string Fullname { get; set; }
+        [Required]
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
     }
 }

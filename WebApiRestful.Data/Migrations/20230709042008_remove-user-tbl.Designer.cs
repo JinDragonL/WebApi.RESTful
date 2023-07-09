@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApiRestful.Data;
 
 namespace WebApiRestful.Data.Migrations
 {
     [DbContext(typeof(WebApiRestfulContext))]
-    partial class WebApiRestfulContextModelSnapshot : ModelSnapshot
+    [Migration("20230709042008_remove-user-tbl")]
+    partial class removeusertbl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -1,4 +1,5 @@
 using Alachisoft.NCache.Caching.Distributed;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -109,6 +110,8 @@ namespace Sample.WebApiRestful
                                 AllowAnyHeader();
                     });
             });
+
+            services.AddValidatorsFromAssemblyContaining<Startup>();
         }
         public class AuthResponsesOperationFilter : IOperationFilter
         {

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApiRestful.Data;
 
 namespace WebApiRestful.Data.Migrations
 {
     [DbContext(typeof(WebApiRestfulContext))]
-    partial class WebApiRestfulContextModelSnapshot : ModelSnapshot
+    [Migration("20230709041739_seeddata")]
+    partial class seeddata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,13 +50,13 @@ namespace WebApiRestful.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "34849bc0-f7c2-4ac7-9ff0-ae07c7f92c73",
+                            Id = "d444cf98-1b68-4d75-be76-997e41df4fed",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
-                            Id = "97d8c63f-4ca8-4475-a096-317efd838884",
+                            Id = "594d700f-a270-46ea-82cb-e0265fefbfa3",
                             Name = "User",
                             NormalizedName = "User"
                         });
@@ -239,15 +241,15 @@ namespace WebApiRestful.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "10bfa6e7-bded-4e3e-8463-af8eda42a41e",
+                            Id = "b74636d6-97ff-49f0-a3fe-5e1da79446f8",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "da9a0851-2578-4b08-acf1-1a5a5b32e273",
+                            ConcurrencyStamp = "396dbffc-1545-44c3-8519-a0292d9b0d59",
                             Email = "admin@ymail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAEO30hK2ywEkjx/O0cXBHWsJ0caZn/82YJiel1ckzU0QFcjP8U2Wbi+ys5xAS7DrhvA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEABAiS8fSWPj8gw16RwFBPGkRER/k+yygTC8LqQK3z7WD1nzdj6yMA221fOfBryzYQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "40ac5c99-30c7-4962-9de2-51ba7b649e2f",
+                            SecurityStamp = "0d6b00ef-a2a8-4514-b47d-ddb4fe57f0e8",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         });
@@ -337,6 +339,40 @@ namespace WebApiRestful.Data.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("WebApiRestful.Domain.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastLoggedIn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("WebApiRestful.Domain.Entities.UserToken", b =>

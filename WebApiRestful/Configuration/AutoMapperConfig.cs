@@ -8,8 +8,8 @@ namespace WebApiRestful.Configuration
     {
         public AutoMapperConfig()
         {
-            CreateMap<UserModel, User>()
-                      .ForMember(dest => dest.DisplayName, y => y.MapFrom(src => src.Fullname))
+            CreateMap<UserModel, ApplicationUser>()
+                      .ForMember(dest => dest.PasswordHash, y => y.MapFrom(src => src.Password))
                       .ReverseMap();
         }
     }
