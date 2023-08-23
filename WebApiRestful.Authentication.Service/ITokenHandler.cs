@@ -9,8 +9,8 @@ namespace WebApiRestful.Authentication.Service
     public interface ITokenHandler
     {
         Task ValidateToken(TokenValidatedContext context);
-        Task<(string, DateTime)> CreateAccessToken(User user);
-        Task<(string, string, DateTime)> CreateRefreshToken(User user);
+        Task<string> CreateAccessToken(ApplicationUser user);
+        Task<(string, string)> CreateRefreshToken(ApplicationUser user);
         Task<JwtModel> ValidateRefreshToken(string refreshToken);
     }
 }

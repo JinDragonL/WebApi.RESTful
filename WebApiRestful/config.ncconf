@@ -1,5 +1,5 @@
 <configuration>
-  <cache-config cache-name="myCache" alias="" config-id="e097c2c0-88af-4aa2-8a8a-c6432eeaa3fe" config-version="0" store-type="distributed-cache">
+  <cache-config cache-name="WebApiRestfulCache" alias="" config-id="e097c2c0-88af-4aa2-8a8a-c6432eeaa3fe" config-version="0" store-type="distributed-cache">
     <cache-settings inproc="True" last-modified="" auto-start="False" data-format="Binary">
       <logging enable-logs="True" trace-errors="True" trace-notices="False" trace-warnings="False" trace-debug="False" log-path=""/>
       <performance-counters enable-counters="True" snmp-port="0"/>

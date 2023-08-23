@@ -40,6 +40,16 @@ namespace Sample.WebApiRestful
                 logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
             });
 
+            //services.AddAuthorization(options =>
+            //{
+            //    //options.AddPolicy("OnlyAdmin", x => x.RequireRole("Admin"));
+
+            //    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+            //                                    .RequireAuthenticatedUser()
+            //                                    .Build();
+
+            //});
+
             //Automapper
 
             services.AddAutoMapper(typeof(AutoMapperConfig).Assembly);
@@ -55,7 +65,7 @@ namespace Sample.WebApiRestful
             services.RegisterContextDb(Configuration);
 
             //Register Dependency Injection
-            services.RegisterDI();
+            services.RegisterDI(Configuration);
 
             // Register Authentication Token
             services.RegisterTokenBear(Configuration);
@@ -165,6 +175,7 @@ namespace Sample.WebApiRestful
 
             app.UseRouting();
             app.UseStatusCodePages();
+
             app.UseAuthentication();
             app.UseAuthorization();
 

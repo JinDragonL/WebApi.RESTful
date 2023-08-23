@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Threading;
 using WebApiRestful.Service.Abstract;
+using WebApiRestful.Domain.Entities;
 
 namespace WebApiRestful.ViewModel
 {
@@ -42,7 +43,7 @@ namespace WebApiRestful.ViewModel
        
         private async Task<bool> Exist(string username, CancellationToken cancellationToken)
         {
-            var user = _userService.FindByUsername(username);
+            ApplicationUser user = null; // _userService.FindByUsername(username);
 
             if (user == null) { return true;  }
 

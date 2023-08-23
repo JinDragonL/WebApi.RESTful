@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -19,17 +20,22 @@ namespace WebApiRestful.Authentication.Service
         IConfiguration _configuration;
         IUserService _userService;
         IUserTokenService _userTokenService;
+        UserManager<ApplicationUser> _userManager;
 
-        public TokenHandler(IConfiguration configuration, IUserService userService, IUserTokenService userTokenService)
+
+        public TokenHandler(IConfiguration configuration, IUserService userService, IUserTokenService userTokenService, UserManager<ApplicationUser> userManager)
         {
             _configuration = configuration;
             _userService = userService;
             _userTokenService = userTokenService;
+            _userManager = userManager;
         }
 
-        public async Task<(string, DateTime)> CreateAccessToken(User user)
+        public async Task<string> CreateAccessToken(ApplicationUser user)
         {
             DateTime expiredToken = DateTime.Now.AddMinutes(int.Parse(_configuration["TokenBear:AccessTokenExpiredByMinutes"]));
+
+            var roles = await _userManager.GetRolesAsync(user);
 
             var cliams = new Claim[]
             {
@@ -38,9 +44,10 @@ namespace WebApiRestful.Authentication.Service
                 new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToString(), ClaimValueTypes.DateTime, _configuration["TokenBear:Issuer"]),
                 new Claim(JwtRegisteredClaimNames.Aud, "WebApiRestful - .NetChannel", ClaimValueTypes.String, _configuration["TokenBear:Issuer"]),
                 new Claim(JwtRegisteredClaimNames.Exp, expiredToken.ToString("yyyy/MM/dd hh:mm:ss"), ClaimValueTypes.String, _configuration["TokenBear:Issuer"]),
-                new Claim(ClaimTypes.Name, user.DisplayName, ClaimValueTypes.String, _configuration["TokenBear:Issuer"]),
-                new Claim("Username", user.Username, ClaimValueTypes.String, _configuration["TokenBear:Issuer"])
-            };
+                new Claim(ClaimTypes.Name, user.Fullname, ClaimValueTypes.String, _configuration["TokenBear:Issuer"]),
+                new Claim("Username", user.UserName, ClaimValueTypes.String, _configuration["TokenBear:Issuer"])
+            }
+            .Union(roles.Select(x => new Claim(ClaimTypes.Role, x)));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["TokenBear:SignatureKey"]));
             var credential = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -56,10 +63,12 @@ namespace WebApiRestful.Authentication.Service
 
             string accessToken = new JwtSecurityTokenHandler().WriteToken(tokenInfo);
 
-            return await Task.FromResult((accessToken, expiredToken));
+            await _userManager.SetAuthenticationTokenAsync(user, "AccessTokenProvider", "AccessToken", accessToken);
+
+            return accessToken;
         }
 
-        public async Task<(string, string, DateTime)> CreateRefreshToken(User user)
+        public async Task<(string, string)> CreateRefreshToken(ApplicationUser user)
         {
             DateTime expiredToken = DateTime.Now.AddHours(int.Parse(_configuration["TokenBear:RefreshTokenExpiredByHours"]));
             string code = Guid.NewGuid().ToString();
@@ -71,6 +80,7 @@ namespace WebApiRestful.Authentication.Service
                 new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToString(), ClaimValueTypes.DateTime, _configuration["TokenBear:Issuer"]),
                 new Claim(JwtRegisteredClaimNames.Exp, expiredToken.ToString("yyyy/MM/dd hh:mm:ss"), ClaimValueTypes.String, _configuration["TokenBear:Issuer"]),
                 new Claim(ClaimTypes.SerialNumber, code, ClaimValueTypes.String, _configuration["TokenBear:Issuer"]),
+                new Claim("Username", user.UserName, ClaimValueTypes.String, _configuration["TokenBear:Issuer"])
             };
 
 
@@ -88,7 +98,9 @@ namespace WebApiRestful.Authentication.Service
 
             string refreshToken = new JwtSecurityTokenHandler().WriteToken(tokenInfo);
 
-            return await Task.FromResult((code, refreshToken, expiredToken));
+            await _userManager.SetAuthenticationTokenAsync(user, "RefreshTokenProvider", "RefreshToken", refreshToken);
+
+            return await Task.FromResult((code, refreshToken));
         }
 
         public async Task ValidateToken(TokenValidatedContext context)
@@ -113,7 +125,7 @@ namespace WebApiRestful.Authentication.Service
             {
                 string username = identity.FindFirst("Username").Value;
 
-                var user = await _userService.FindByUsername(username);
+                var user = await _userManager.FindByNameAsync(username);
 
                 if(user == null)
                 {
@@ -164,27 +176,22 @@ namespace WebApiRestful.Authentication.Service
 
             if (cliamPriciple == null) return new();
 
-            string code = cliamPriciple?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.SerialNumber)?.Value;
+            string username = cliamPriciple?.Claims?.FirstOrDefault(x => x.Type == "Username")?.Value;
 
-            if (string.IsNullOrEmpty(code)) return new();
+            var user = await _userManager.FindByNameAsync(username);
 
-            UserToken userToken = await _userTokenService.CheckRefreshToken(code);
+            var token = await _userManager.GetAuthenticationTokenAsync(user, "AccessTokenProvider", "AccessToken");
 
-            if(userToken != null)
+            if (!string.IsNullOrEmpty(token))
             {
-                User user = await _userService.FindById(userToken.Id);
-
-                (string newAccessToken, DateTime createdDate) = await CreateAccessToken(user);
-                (string codeRefreshToken, string newRefreshToken, DateTime newDateCreated) = await CreateRefreshToken(user);
+                string newAccessToken = await CreateAccessToken(user);
+                (string codeRefreshToken, string newRefreshToken) = await CreateRefreshToken(user);
 
                 return new JwtModel
                 {
                     AccessToken = newAccessToken,
                     RefreshToken = newRefreshToken,
-                    Fullname = user.DisplayName,
-                    Username = user.Username
                 };
-
             }
 
             return new();

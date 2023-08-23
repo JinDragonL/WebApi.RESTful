@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using System.Threading.Tasks;
 using WebApiRestful.Data.Abstract;
 using WebApiRestful.Domain.Entities;
 using WebApiRestful.Service.Abstract;
@@ -8,25 +10,31 @@ namespace WebApiRestful.Service
     public class UserService : IUserService
     {
         IUnitOfWork _unitOfWork;
+        UserManager<ApplicationUser> _userManager;
 
-        public UserService(IUnitOfWork unitOfWork)
+        public UserService(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
+            _userManager = userManager;
         }
 
-        public async Task<User> CheckLogin(string username, string password)
+        public async Task<ApplicationUser> CheckLogin(string username, string password)
         {
-            return await _unitOfWork.RepositoryUser.GetSingleByConditionAsync(x => x.Username == username && x.Password == password);
-        }
+            var user = await _userManager.FindByNameAsync(username);
 
-        public async Task<User> FindByUsername(string username)
-        {
-            return await _unitOfWork.RepositoryUser.GetSingleByConditionAsync(x => x.Username == username);
-        }
+            if(user == null)
+            {
+                return default(ApplicationUser);
+            }
 
-        public async Task<User> FindById(int userId)
-        {
-            return await _unitOfWork.RepositoryUser.GetSingleByConditionAsync(x => x.Id == userId);
+            var isExist = await _userManager.CheckPasswordAsync(user, password);
+
+            if(!isExist)
+            {
+                return default(ApplicationUser);
+            }
+
+            return user;
         }
     }
 }

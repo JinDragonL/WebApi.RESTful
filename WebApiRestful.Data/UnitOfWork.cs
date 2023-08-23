@@ -8,7 +8,6 @@ namespace WebApiRestful.Data
     public class UnitOfWork : IUnitOfWork, IDisposable
     {
         WebApiRestfulContext _webApiRestfulContext;
-        Repository<User> _repositoryUser;
         Repository<UserToken> _repositoryUserToken;
 
         private bool _disposedValue;
@@ -18,7 +17,6 @@ namespace WebApiRestful.Data
             _webApiRestfulContext = webApiRestfulContext;
         }
 
-        public Repository<User> RepositoryUser { get { return _repositoryUser ??= new Repository<User>(_webApiRestfulContext); } }
         public Repository<UserToken> RepositoryUserToken
         {
             get

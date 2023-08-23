@@ -1,12 +1,9 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using WebApiRestful.Authentication.Service;
-using WebApiRestful.Domain.Entities;
 using WebApiRestful.Domain.Model;
 using WebApiRestful.Service.Abstract;
 using WebApiRestful.ViewModel;
@@ -35,16 +32,16 @@ namespace WebApiRestful.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(IValidator<AccountModel> validator, [FromBody] AccountModel accountModel)
         {
-            var validations = await validator.ValidateAsync(accountModel);
+            //var validations = await validator.ValidateAsync(accountModel);
 
-            if(!validations.IsValid)
-            {
-                return BadRequest(validations.Errors.Select(x => new ErrorValdations
-                {
-                    FieldName = x.PropertyName,
-                    ErrorMessage = x.ErrorMessage
-                }));
-            }
+            //if(!validations.IsValid)
+            //{
+            //    return BadRequest(validations.Errors.Select(x => new ErrorValdations
+            //    {
+            //        FieldName = x.PropertyName,
+            //        ErrorMessage = x.ErrorMessage
+            //    }));
+            //}
 
             var user = await _userService.CheckLogin(accountModel.Username, accountModel.Password);
 
@@ -53,27 +50,13 @@ namespace WebApiRestful.Controllers
                 return Unauthorized();
             }
 
-            (string accessToken, DateTime expiredDateAccess) = await _tokenHandler.CreateAccessToken(user);
-            (string code, string refreshToken, DateTime expiredDateRefresh) = await _tokenHandler.CreateRefreshToken(user);
-
-            await _userTokenService.SaveToken(new Domain.Entities.UserToken
-            {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken,
-                CodeRefreshToken = code,
-                ExpiredDateAccessToken = expiredDateAccess,
-                ExpiredDateRefreshToken = expiredDateRefresh,
-                CreatedDate = DateTime.Now,
-                UserId = user.Id,
-                IsActive = true
-            });
+            string accessToken = await _tokenHandler.CreateAccessToken(user);
+            (string code, string refreshToken) = await _tokenHandler.CreateRefreshToken(user);
 
             return Ok(new JwtModel
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
-                Fullname = user.DisplayName,
-                Username = user.Username
             });
         }
 

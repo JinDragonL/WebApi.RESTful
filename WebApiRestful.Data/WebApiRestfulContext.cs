@@ -14,8 +14,8 @@ namespace WebApiRestful.Data
         private readonly IServiceProvider _serviceProvider;
 
         public WebApiRestfulContext(DbContextOptions<WebApiRestfulContext> options, 
-            IConfiguration configuration,
-            IServiceProvider serviceProvider) : base(options)
+                                    IConfiguration configuration, 
+                                    IServiceProvider serviceProvider) : base(options)
         {
             _configuration = configuration;
             _serviceProvider = serviceProvider;
@@ -23,11 +23,8 @@ namespace WebApiRestful.Data
 
         public DbSet<Categories> Categories { get; set; }
         public DbSet<Products> Products { get; set; }
-        public DbSet<UserToken> UserToken { get; set; }
+        //public DbSet<UserToken> UserToken { get; set; }
         public DbSet<DBLog> DBLog { get; set; }
-
-        //AspNetUser
-        //AspNetRole
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -40,37 +37,63 @@ namespace WebApiRestful.Data
             SeedData(modelBuilder);
         }
 
-
         private void SeedData(ModelBuilder modelBuilder)
         {
+
+            string defaultName = "Admin";
+            string defaultEmail = "admin@ymail.com";
+
             var passwordHasherService = _serviceProvider.CreateScope().ServiceProvider.GetService<PasswordHasher<ApplicationUser>>();
+
+            string roleId = string.Empty;
+
+            var roles = _configuration.GetSection("DefaultRole");
+
+            if (roles.Exists())
+            {
+                foreach (var role in roles.GetChildren())
+                {
+                    string id = Guid.NewGuid().ToString();
+
+                    modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole
+                    {
+                        Id = id,
+                        Name = role.Value,
+                        NormalizedName = role.Value.ToUpper(),
+                    });
+
+                    if(role.Value == defaultName)
+                    {
+                        roleId = id;
+                    }
+                }
+            }
+
+            string userId = Guid.NewGuid().ToString();
 
             modelBuilder.Entity<ApplicationUser>().HasData(
                 new ApplicationUser
                 {
-                   Id = Guid.NewGuid().ToString(),
-                   UserName = "admin",
-                   PasswordHash = passwordHasherService.HashPassword(new ApplicationUser(), "1"),
-                   Email = "admin@ymail.com",
-                   AccessFailedCount = 0
+                    Id = userId,
+                    UserName = defaultName.ToLower(),
+                    NormalizedUserName = defaultName.ToUpper(),
+                    Email = defaultEmail,
+                    NormalizedEmail = defaultEmail.ToUpper(),
+                    AccessFailedCount = 0,
+                    PasswordHash = passwordHasherService.HashPassword(new ApplicationUser
+                    {
+                        UserName = defaultName.ToLower(),
+                        NormalizedUserName = defaultName.ToUpper(),
+                        Email = defaultEmail,
+                        NormalizedEmail = defaultEmail.ToUpper(),
+                    }, "1")
                 });
 
-            var defaltRoles = _configuration.GetSection("DefaultRole");
-
-            if(defaltRoles.Exists()) {
-
-                foreach (var role in defaltRoles.GetChildren())
-                {
-                    modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Name = role.Value,
-                        NormalizedName = role.Value.ToString()
-                    });
-                }
-            }
-
+            modelBuilder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
+            {
+                RoleId = roleId,
+                UserId = userId,
+            });
         }
-
     }
 }
