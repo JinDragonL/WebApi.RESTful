@@ -11,9 +11,9 @@ namespace WebApiRestful.Data.Abstract
         /// </summary>
         /// <param name="query"></param>
         /// <param name="parammeters"></param>
-        void ExecuteNotReturn(string query, DynamicParameters parammeters = null);
-        Task<T> ExecuteReturnScalar<T>(string query, DynamicParameters parammeters = null);
-        Task<IEnumerable<T>> ExecuteSqlReturnList<T>(string query, DynamicParameters parammeters = null);
-        Task<IEnumerable<T>> ExecuteStoreProcedureReturnList<T>(string query, DynamicParameters parammeters = null);
+        Task ExecuteNotReturnAsync(string query, DynamicParameters parammeters = null);
+        Task<T> ExecuteReturnScalarAsync<T>(string query, DynamicParameters parammeters = null);
+        Task<IEnumerable<T>> ExecuteSqlReturnListAsync<T>(string query, DynamicParameters parammeters = null);
+        Task<IEnumerable<T>> ExecuteStoreProcedureReturnListAsync<T>(string query, DynamicParameters parammeters = null);
     }
 }

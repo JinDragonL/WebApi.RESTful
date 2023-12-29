@@ -37,7 +37,7 @@ namespace Sample.WebApiRestful
             {
                 logging.AddNLog();
                 logging.ClearProviders();
-                logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Warning);
             });
 
             //services.AddAuthorization(options =>

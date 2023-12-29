@@ -15,14 +15,11 @@ namespace WebApiRestful.Controllers
     {
         IUserService _userService;
         ITokenHandler _tokenHandler;
-        IUserTokenService _userTokenService;
 
-        public AuthenticationController(IUserService userService, ITokenHandler tokenHandler, 
-                                        IUserTokenService userTokenService)
+        public AuthenticationController(IUserService userService, ITokenHandler tokenHandler)
         {
             _userService = userService;
             _tokenHandler = tokenHandler;
-            _userTokenService = userTokenService;
         }
 
         //FluentValidation
@@ -44,7 +41,7 @@ namespace WebApiRestful.Controllers
 
             var user = await _userService.CheckLogin(accountModel.Username, accountModel.Password, accountModel.Key);
 
-            if(user == null)
+            if(user is null)
             {
                 return Unauthorized();
             }
@@ -55,7 +52,7 @@ namespace WebApiRestful.Controllers
             }
 
             string accessToken = await _tokenHandler.CreateAccessToken(user);
-            (string code, string refreshToken) = await _tokenHandler.CreateRefreshToken(user);
+            string refreshToken = await _tokenHandler.CreateRefreshToken(user);
 
             return Ok(new JwtModel
             {

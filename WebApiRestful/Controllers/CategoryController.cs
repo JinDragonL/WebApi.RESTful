@@ -37,7 +37,7 @@ namespace WebApiRestful.Controllers
 
             await _emailHelper.SendEmailAsync(cancellationToken, new Domain.Model.EmailRequest
             {
-                To = "giacmonghuthuc@gmail.com",
+                To = "************",
                 Subject = "This is test for sending mail from NetCore",
                 Content = "No Content!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
             });

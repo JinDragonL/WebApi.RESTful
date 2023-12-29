@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -21,14 +22,13 @@ namespace WebApiRestful.Authentication.Service
         private const string TokenBearIssuer = "TokenBear:Issuer";
         private const string TokenBearAudience = "TokenBear:Audience";
         private const string TokenBearSignatureKey = "TokenBear:SignatureKey";
+        private const string TokenBearExpiredTimeByMinutes = "TokenBear:AccessTokenExpiredByMinutes";
         private const string AccessTokenProvider = "AccessTokenProvider";
         private const string RefreshTokenProvider = "RefreshTokenProvider";
         private const string AccessToken = "AccessToken";
         private const string RefreshToken = "RefreshToke";
-        private const string TokenBearExpiredTimeByMinutes = "TokenBear:AccessTokenExpiredByMinutes";
 
-        public TokenHandler(IConfiguration configuration,
-                            UserManager<ApplicationUser> userManager)
+        public TokenHandler(IConfiguration configuration, UserManager<ApplicationUser> userManager)
         {
             _configuration = configuration;
             _userManager = userManager;
@@ -36,72 +36,88 @@ namespace WebApiRestful.Authentication.Service
 
         public async Task<string> CreateAccessToken(ApplicationUser user)
         {
-            DateTime expiredToken = DateTime.Now.AddMinutes(int.Parse(_configuration[TokenBearExpiredTimeByMinutes]));
+            string issuer = _configuration[TokenBearIssuer];
+            string audience = _configuration[TokenBearAudience];
+            string signatureKey = _configuration[TokenBearSignatureKey];
+            int tokenExpirationMinutes = int.Parse(_configuration[TokenBearExpiredTimeByMinutes]);
+
+            DateTime expiresAt = DateTime.Now.AddMinutes(tokenExpirationMinutes);
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            var cliams = new Claim[]
+            var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString(), ClaimValueTypes.String, _configuration[TokenBearIssuer]),
-                new Claim(JwtRegisteredClaimNames.Iss, _configuration[TokenBearIssuer], ClaimValueTypes.String, _configuration[TokenBearIssuer]),
-                new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToString(), ClaimValueTypes.DateTime, _configuration[TokenBearIssuer]),
-                new Claim(JwtRegisteredClaimNames.Aud, "WebApiRestful - .NetChannel", ClaimValueTypes.String, _configuration[TokenBearIssuer]),
-                new Claim(JwtRegisteredClaimNames.Exp, expiredToken.ToString("yyyy/MM/dd hh:mm:ss"), ClaimValueTypes.String, _configuration[TokenBearIssuer]),
-                new Claim(ClaimTypes.Name, user.UserName, ClaimValueTypes.String, _configuration[TokenBearIssuer])
-            }
-            .Union(roles.Select(x => new Claim(ClaimTypes.Role, x)));
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString(), ClaimValueTypes.String, issuer),
+                new Claim(JwtRegisteredClaimNames.Iss, issuer, ClaimValueTypes.String, issuer),
+                new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToString(), ClaimValueTypes.DateTime, issuer),
+                new Claim(JwtRegisteredClaimNames.Aud, audience, ClaimValueTypes.String, issuer),
+                new Claim(JwtRegisteredClaimNames.Exp, expiresAt.ToString("yyyy/MM/dd hh:mm:ss"), ClaimValueTypes.String, issuer),
+                new Claim(ClaimTypes.Name, user.UserName, ClaimValueTypes.String, issuer)
+            };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration[TokenBearSignatureKey]));
-            var credential = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            var tokenInfo = new JwtSecurityToken(
-                issuer: _configuration[TokenBearIssuer],
-                audience: _configuration[TokenBearAudience],
-                claims: cliams,
-                notBefore: DateTime.Now,
-                expires: expiredToken,
-                credential
-            );
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signatureKey));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            string accessToken = new JwtSecurityTokenHandler().WriteToken(tokenInfo);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Issuer = issuer,
+                Audience = audience,
+                Subject = new ClaimsIdentity(claims),
+                NotBefore = DateTime.Now,
+                Expires = expiresAt,
+                SigningCredentials = credentials
+            };
 
-            await _userManager.SetAuthenticationTokenAsync(user, AccessTokenProvider, AccessToken, accessToken);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var accessToken = tokenHandler.CreateToken(tokenDescriptor);
 
-            return accessToken;
+            await _userManager.SetAuthenticationTokenAsync(user, AccessTokenProvider, AccessToken, tokenHandler.WriteToken(accessToken));
+
+            return tokenHandler.WriteToken(accessToken);
         }
 
         public async Task<string> CreateRefreshToken(ApplicationUser user)
         {
-            DateTime expiredToken = DateTime.Now.AddHours(int.Parse(_configuration["TokenBear:RefreshTokenExpiredByHours"]));
-            string code = Guid.NewGuid().ToString();
+            string issuer = _configuration[TokenBearIssuer];
+            string audience = _configuration[TokenBearAudience];
+            string signatureKey = _configuration[TokenBearSignatureKey];
+            int refreshTokenExpirationHours = int.Parse(_configuration["TokenBear:RefreshTokenExpiredByHours"]);
 
-            var cliams = new Claim[]
+            DateTime expiresAt = DateTime.Now.AddHours(refreshTokenExpirationHours);
+
+            string refreshTokenCode = Guid.NewGuid().ToString();
+
+            var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString(), ClaimValueTypes.String, _configuration[TokenBearIssuer]),
-                new Claim(JwtRegisteredClaimNames.Iss, _configuration[TokenBearIssuer], ClaimValueTypes.String, _configuration[TokenBearIssuer]),
-                new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToString(), ClaimValueTypes.DateTime, _configuration[TokenBearIssuer]),
-                new Claim(JwtRegisteredClaimNames.Exp, expiredToken.ToString("yyyy/MM/dd hh:mm:ss"), ClaimValueTypes.String, _configuration[TokenBearIssuer]),
-                new Claim(ClaimTypes.SerialNumber, code, ClaimValueTypes.String, _configuration[TokenBearIssuer]),
-                new Claim(ClaimTypes.Name, user.UserName, ClaimValueTypes.String, _configuration[TokenBearIssuer])
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString(), ClaimValueTypes.String, issuer),
+                new Claim(JwtRegisteredClaimNames.Iss, issuer, ClaimValueTypes.String, issuer),
+                new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToString(), ClaimValueTypes.DateTime, issuer),
+                new Claim(JwtRegisteredClaimNames.Exp, expiresAt.ToString("yyyy/MM/dd hh:mm:ss"), ClaimValueTypes.String, issuer),
+                new Claim(ClaimTypes.SerialNumber, refreshTokenCode, ClaimValueTypes.String, issuer),
+                new Claim(ClaimTypes.Name, user.UserName, ClaimValueTypes.String, issuer)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration[TokenBearSignatureKey]));
-            var credential = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signatureKey));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var tokenInfo = new JwtSecurityToken(
-                issuer: _configuration[TokenBearIssuer],
-                audience: _configuration[TokenBearAudience],
-                claims: cliams,
-                notBefore: DateTime.Now,
-                expires: expiredToken,
-                credential
-            );
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Issuer = issuer,
+                Audience = audience,
+                Subject = new ClaimsIdentity(claims),
+                NotBefore = DateTime.Now,
+                Expires = expiresAt,
+                SigningCredentials = credentials
+            };
 
-            string refreshToken = new JwtSecurityTokenHandler().WriteToken(tokenInfo);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var refreshToken = tokenHandler.CreateToken(tokenDescriptor);
 
-            await _userManager.SetAuthenticationTokenAsync(user, RefreshTokenProvider, RefreshToken, refreshToken);
+            await _userManager.SetAuthenticationTokenAsync(user, RefreshTokenProvider, RefreshToken, tokenHandler.WriteToken(refreshToken));
 
-            return refreshToken;
+            return tokenHandler.WriteToken(refreshToken);
         }
 
         public async Task ValidateToken(TokenValidatedContext context)
@@ -157,42 +173,53 @@ namespace WebApiRestful.Authentication.Service
 
         public async Task<JwtModel> ValidateRefreshToken(string refreshToken)
         {
-            var cliamPriciple = new JwtSecurityTokenHandler().ValidateToken(
-                    refreshToken,
-                    new TokenValidationParameters
-                    {
-                        RequireExpirationTime = true,
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration[TokenBearSignatureKey])),
-                        ValidateIssuerSigningKey = true,
-                        ValidateLifetime = true,
-                        ClockSkew = TimeSpan.Zero
-                    },
-                    out _
-                );
+            var tokenHandler = new JwtSecurityTokenHandler();
 
-            if (cliamPriciple == null) return new();
-
-            string username = cliamPriciple?.Claims?.FirstOrDefault(x => x.Type == "Username")?.Value;
-
-            var user = await _userManager.FindByNameAsync(username);
-
-            var token = await _userManager.GetAuthenticationTokenAsync(user, AccessTokenProvider, AccessToken);
-
-            if (!string.IsNullOrEmpty(token))
+            try
             {
-                string newAccessToken = await CreateAccessToken(user);
-                string newRefreshToken = await CreateRefreshToken(user);
+                var principal = tokenHandler.ValidateToken(refreshToken, GetTokenValidationParameters(), out _);
 
-                return new JwtModel
+                string username = principal?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+
+                var user = await _userManager.FindByNameAsync(username);
+
+                if (user != null)
                 {
-                    AccessToken = newAccessToken,
-                    RefreshToken = newRefreshToken,
-                };
+                    var existingAccessToken = await _userManager.GetAuthenticationTokenAsync(user, AccessTokenProvider, AccessToken);
+
+                    if (!string.IsNullOrEmpty(existingAccessToken))
+                    {
+                        string newAccessToken = await CreateAccessToken(user);
+                        string newRefreshToken = await CreateRefreshToken(user);
+
+                        return new JwtModel
+                        {
+                            AccessToken = newAccessToken,
+                            RefreshToken = newRefreshToken
+                        };
+                    }
+                }
+            }
+            catch (SecurityTokenException)
+            {
+                // Token validation failed
             }
 
-            return new();
+            return new JwtModel();
+        }
+
+        private TokenValidationParameters GetTokenValidationParameters()
+        {
+            return new TokenValidationParameters
+            {
+                RequireExpirationTime = true,
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration[TokenBearSignatureKey])),
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
         }
 
     }

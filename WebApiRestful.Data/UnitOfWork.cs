@@ -17,13 +17,7 @@ namespace WebApiRestful.Data
             _webApiRestfulContext = webApiRestfulContext;
         }
 
-        public Repository<UserToken> RepositoryUserToken
-        {
-            get
-            {
-                return _repositoryUserToken ??= new Repository<UserToken>(_webApiRestfulContext);
-            }
-        }
+        public Repository<UserToken> RepositoryUserToken =>  _repositoryUserToken ??= new Repository<UserToken>(_webApiRestfulContext);
 
         public async Task CommitAsync()
         {
@@ -50,10 +44,3 @@ namespace WebApiRestful.Data
         }
     }
 }
-
-//Cache
-
-//Memory-Cache -->  IMemoryCache 
-//Distribute Cache --> NCache 
-//Redis  --> 
-//Sql Cache

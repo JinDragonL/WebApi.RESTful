@@ -26,12 +26,10 @@ namespace WebApiRestful.Controllers
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly PasswordHasher<ApplicationUser> _passwordHasher;
-        private readonly PasswordValidator<ApplicationUser> _passwordValidator;
 
         public UserController(IMapper mapper, 
                                 UserManager<ApplicationUser> userManager, 
                                 PasswordHasher<ApplicationUser> passwordHasher,
-                                PasswordValidator<ApplicationUser> passwordValidator,
                                 IEmailHelper  emailHelper,
                                 IEmailTemplateReader emailTemplateReader,
                                 IConfiguration configuration)
@@ -39,7 +37,6 @@ namespace WebApiRestful.Controllers
             _mapper = mapper;
             _userManager = userManager;
             _passwordHasher = passwordHasher;
-            _passwordValidator = passwordValidator;
             _emailHelper = emailHelper;
             _emailTemplateReader = emailTemplateReader;
             _configuration = configuration;
@@ -120,7 +117,7 @@ namespace WebApiRestful.Controllers
         {
             var user = await _userManager.FindByIdAsync(memberKey);
 
-            if(user == null)
+            if(user is null)
             {
                 return BadRequest("Account is exist in the system");
             }
@@ -189,16 +186,13 @@ namespace WebApiRestful.Controllers
 
             var identityResult = await _userManager.ResetPasswordAsync(user, decodedToken, resetPasswordMd.Password);
 
-            if(identityResult.Succeeded)
-            {
-                return Ok("Reset password successful");
-            }
-            else
+            if(!identityResult.Succeeded)
             {
                 return BadRequest(identityResult.Errors.ToList()[0].Description);
             }
 
-            return Ok("Reset password failed");
+            return Ok("Reset password successful");
+
         }
     }
 }

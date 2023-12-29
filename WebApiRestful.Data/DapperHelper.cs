@@ -17,15 +17,15 @@ namespace WebApiRestful.Data
             connectString = configuration.GetConnectionString("SampleWebApiConnection");
         }
 
-        public void ExecuteNotReturn(string query, DynamicParameters parammeters = null)
+        public async Task ExecuteNotReturnAsync(string query, DynamicParameters parammeters = null)
         {
             using (var dbConnection = new SqlConnection(connectString))
             {
-                dbConnection.ExecuteAsync(query, parammeters, commandType: CommandType.Text);
+               await dbConnection.ExecuteAsync(query, parammeters, commandType: CommandType.Text);
             }
         }
 
-        public async Task<T> ExecuteReturnScalar<T>(string query, DynamicParameters parammeters = null)
+        public async Task<T> ExecuteReturnScalarAsync<T>(string query, DynamicParameters parammeters = null)
         {
             using (var dbConnection = new SqlConnection(connectString))
             {
@@ -34,7 +34,7 @@ namespace WebApiRestful.Data
             }
         }
 
-        public async Task<IEnumerable<T>> ExecuteSqlReturnList<T>(string query, DynamicParameters parammeters = null)
+        public async Task<IEnumerable<T>> ExecuteSqlReturnListAsync<T>(string query, DynamicParameters parammeters = null)
         {
             using (var dbConnection = new SqlConnection(connectString))
             {
@@ -42,7 +42,7 @@ namespace WebApiRestful.Data
             }
         }
 
-        public async Task<IEnumerable<T>> ExecuteStoreProcedureReturnList<T>(string query, DynamicParameters parammeters = null)
+        public async Task<IEnumerable<T>> ExecuteStoreProcedureReturnListAsync<T>(string query, DynamicParameters parammeters = null)
         {
             using (var dbConnection = new SqlConnection(connectString))
             {
