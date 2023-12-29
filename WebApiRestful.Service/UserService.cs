@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Threading.Tasks;
+using WebApi.Restful.Core.Common;
 using WebApiRestful.Data.Abstract;
 using WebApiRestful.Domain.Entities;
 using WebApiRestful.Service.Abstract;
@@ -18,7 +18,7 @@ namespace WebApiRestful.Service
             _userManager = userManager;
         }
 
-        public async Task<ApplicationUser> CheckLogin(string username, string password)
+        public async Task<ApplicationUser> CheckLogin(string username, string encryptedPassword, string key)
         {
             var user = await _userManager.FindByNameAsync(username);
 
@@ -27,9 +27,11 @@ namespace WebApiRestful.Service
                 return default(ApplicationUser);
             }
 
-            var isExist = await _userManager.CheckPasswordAsync(user, password);
+            string plainPassword = AESEncryption.DecryptStringAES(encryptedPassword, key);
 
-            if(!isExist)
+            var hasExist = await _userManager.CheckPasswordAsync(user, plainPassword);
+
+            if (!hasExist)
             {
                 return default(ApplicationUser);
             }

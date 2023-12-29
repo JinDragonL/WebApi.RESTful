@@ -29,7 +29,8 @@ namespace WebApiRestful.Data
         {
             using (var dbConnection = new SqlConnection(connectString))
             {
-                return  (T)Convert.ChangeType(await dbConnection.ExecuteScalarAsync<T>(query, parammeters, commandType: System.Data.CommandType.StoredProcedure), typeof(T));
+                return  (T)Convert.ChangeType(await dbConnection.ExecuteScalarAsync<T>(query, parammeters, 
+                                                                commandType: System.Data.CommandType.StoredProcedure), typeof(T));
             }
         }
 

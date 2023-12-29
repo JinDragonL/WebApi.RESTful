@@ -5,6 +5,6 @@ namespace WebApiRestful.Service.Abstract
 {
     public interface IUserService
     {
-        Task<ApplicationUser> CheckLogin(string username, string password);
+        Task<ApplicationUser> CheckLogin(string username, string password, string key);
     }
 }

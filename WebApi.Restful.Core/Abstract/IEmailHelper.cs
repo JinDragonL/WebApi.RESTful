@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using WebApiRestful.Domain.Model;
 
-namespace WebApi.Restful.Core.EmailHelper
+namespace WebApi.Restful.Core.Abstract
 {
     public interface IEmailHelper
     {

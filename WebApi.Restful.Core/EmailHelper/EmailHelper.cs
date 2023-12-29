@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using WebApi.Restful.Core.Abstract;
 using WebApi.Restful.Core.Configuration;
 using WebApiRestful.Domain.Model;
 
@@ -56,8 +54,6 @@ namespace WebApi.Restful.Core.EmailHelper
                 //log ex
                 throw;
             }
-
         }
-
     }
 }

@@ -10,7 +10,7 @@ namespace WebApiRestful.Authentication.Service
     {
         Task ValidateToken(TokenValidatedContext context);
         Task<string> CreateAccessToken(ApplicationUser user);
-        Task<(string, string)> CreateRefreshToken(ApplicationUser user);
+        Task<string> CreateRefreshToken(ApplicationUser user);
         Task<JwtModel> ValidateRefreshToken(string refreshToken);
     }
 }

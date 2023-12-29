@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace WebApi.Restful.Core.Cache
+namespace WebApi.Restful.Core.Abstract
 {
     public interface IDistributedCacheService
     {

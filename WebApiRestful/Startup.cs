@@ -115,7 +115,7 @@ namespace Sample.WebApiRestful
                 options.AddPolicy(
                     "MyPolicy", builder =>
                     {
-                        builder.WithOrigins("http://localhost:4200").
+                        builder.AllowAnyOrigin().
                                 AllowAnyMethod().
                                 AllowAnyHeader();
                     });

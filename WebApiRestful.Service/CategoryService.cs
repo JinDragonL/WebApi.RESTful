@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using WebApi.Restful.Core.Cache;
+using WebApi.Restful.Core.Abstract;
 using WebApiRestful.Data.Abstract;
 using WebApiRestful.Domain.Entities;
 using WebApiRestful.Service.Abstract;

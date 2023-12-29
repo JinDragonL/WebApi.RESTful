@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using WebApi.Restful.Core.Abstract;
 using WebApi.Restful.Core.Cache;
 using WebApi.Restful.Core.Configuration;
 using WebApi.Restful.Core.EmailHelper;
@@ -29,6 +31,11 @@ namespace WebApiRestful.Infrastructure.Configuration
                     })
                     .AddEntityFrameworkStores<WebApiRestfulContext>()
                     .AddDefaultTokenProviders();
+
+            service.Configure<DataProtectionTokenProviderOptions>(options =>
+            {
+                options.TokenLifespan = TimeSpan.FromHours(10);
+            });
         }
 
         public static void RegisterDI(this IServiceCollection service, IConfiguration configuration)

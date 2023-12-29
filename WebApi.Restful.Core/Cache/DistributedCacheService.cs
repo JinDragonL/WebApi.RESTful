@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
+using WebApi.Restful.Core.Abstract;
 
 namespace WebApi.Restful.Core.Cache
 {

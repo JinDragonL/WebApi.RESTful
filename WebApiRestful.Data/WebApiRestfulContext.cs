@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using WebApiRestful.Domain.Entities;
+using System;
 
 namespace WebApiRestful.Data
 {
@@ -13,8 +13,8 @@ namespace WebApiRestful.Data
         private readonly IConfiguration _configuration;
         private readonly IServiceProvider _serviceProvider;
 
-        public WebApiRestfulContext(DbContextOptions<WebApiRestfulContext> options, 
-                                    IConfiguration configuration, 
+        public WebApiRestfulContext(DbContextOptions<WebApiRestfulContext> options,
+                                    IConfiguration configuration,
                                     IServiceProvider serviceProvider) : base(options)
         {
             _configuration = configuration;
@@ -23,7 +23,6 @@ namespace WebApiRestful.Data
 
         public DbSet<Categories> Categories { get; set; }
         public DbSet<Products> Products { get; set; }
-        //public DbSet<UserToken> UserToken { get; set; }
         public DbSet<DBLog> DBLog { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -39,13 +38,13 @@ namespace WebApiRestful.Data
 
         private void SeedData(ModelBuilder modelBuilder)
         {
+            string username = _configuration["DefaultUser:Username"];
+            string email = _configuration["DefaultUser:Email"];
+            string defaultRole = _configuration["DefaultUser:Role"];
+            string password = _configuration["DefaultUser:Password"];
 
-            string defaultName = "Admin";
-            string defaultEmail = "admin@ymail.com";
-
-            var passwordHasherService = _serviceProvider.CreateScope().ServiceProvider.GetService<PasswordHasher<ApplicationUser>>();
-
-            string roleId = string.Empty;
+            using var scope = _serviceProvider.CreateScope();
+            var passwordHasherService = scope.ServiceProvider.GetService<PasswordHasher<ApplicationUser>>();
 
             var roles = _configuration.GetSection("DefaultRole");
 
@@ -53,18 +52,18 @@ namespace WebApiRestful.Data
             {
                 foreach (var role in roles.GetChildren())
                 {
-                    string id = Guid.NewGuid().ToString();
+                    string roleId = Guid.NewGuid().ToString();
 
                     modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole
                     {
-                        Id = id,
+                        Id = roleId,
                         Name = role.Value,
                         NormalizedName = role.Value.ToUpper(),
                     });
 
-                    if(role.Value == defaultName)
+                    if (role.Value == defaultRole)
                     {
-                        roleId = id;
+                        defaultRole = roleId;
                     }
                 }
             }
@@ -75,23 +74,23 @@ namespace WebApiRestful.Data
                 new ApplicationUser
                 {
                     Id = userId,
-                    UserName = defaultName.ToLower(),
-                    NormalizedUserName = defaultName.ToUpper(),
-                    Email = defaultEmail,
-                    NormalizedEmail = defaultEmail.ToUpper(),
+                    UserName = username.ToLower(),
+                    NormalizedUserName = username.ToUpper(),
+                    Email = email,
+                    NormalizedEmail = email.ToUpper(),
                     AccessFailedCount = 0,
                     PasswordHash = passwordHasherService.HashPassword(new ApplicationUser
                     {
-                        UserName = defaultName.ToLower(),
-                        NormalizedUserName = defaultName.ToUpper(),
-                        Email = defaultEmail,
-                        NormalizedEmail = defaultEmail.ToUpper(),
-                    }, "1")
+                        UserName = username.ToLower(),
+                        NormalizedUserName = username.ToUpper(),
+                        Email = email,
+                        NormalizedEmail = email.ToUpper()
+                    }, password)
                 });
 
             modelBuilder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
             {
-                RoleId = roleId,
+                RoleId = defaultRole,
                 UserId = userId,
             });
         }

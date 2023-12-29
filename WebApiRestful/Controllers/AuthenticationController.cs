@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Threading.Tasks;
 using WebApiRestful.Authentication.Service;
 using WebApiRestful.Domain.Model;
@@ -43,11 +42,16 @@ namespace WebApiRestful.Controllers
             //    }));
             //}
 
-            var user = await _userService.CheckLogin(accountModel.Username, accountModel.Password);
+            var user = await _userService.CheckLogin(accountModel.Username, accountModel.Password, accountModel.Key);
 
             if(user == null)
             {
                 return Unauthorized();
+            }
+
+            if(!user.EmailConfirmed)
+            {
+                return BadRequest("Your account is inactive");
             }
 
             string accessToken = await _tokenHandler.CreateAccessToken(user);

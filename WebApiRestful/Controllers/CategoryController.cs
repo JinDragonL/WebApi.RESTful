@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
-using WebApi.Restful.Core.EmailHelper;
+using WebApi.Restful.Core.Abstract;
 using WebApiRestful.Service.Abstract;
 
 namespace WebApiRestful.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]  //api/category
     [ApiController]
     public class CategoryController : ControllerBase
